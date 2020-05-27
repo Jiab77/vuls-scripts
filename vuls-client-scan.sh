@@ -44,7 +44,10 @@ verify_scan() {
 # Scan Ubuntu client
 scan_ubuntu() {
     echo -e "${WHITE}Scanning ${GREEN}$(hostname) ${WHITE}/${YELLOW} Ubuntu ${WHITE}based client...${NC}${NL}"
-    curl -X POST -H "Content-Type: text/plain" -H "X-Vuls-OS-Family: `lsb_release -si | awk '{print tolower($1)}'`" -H "X-Vuls-OS-Release: `lsb_release -sr | awk '{print $1}'`" -H "X-Vuls-Kernel-Release: `uname -r`" -H "X-Vuls-Server-Name: `hostname`" --data-binary "$(dpkg-query -W -f="\${binary:Package},\${db:Status-Abbrev},\${Version},\${Source},\${source:Version}\n")" http://${VULS_SERVER}:5515/vuls > $LOCAL_REPORT
+    # curl -X POST -H "Content-Type: text/plain" -H "X-Vuls-OS-Family: `lsb_release -si | awk '{print tolower($1)}'`" -H "X-Vuls-OS-Release: `lsb_release -sr | awk '{print $1}'`" -H "X-Vuls-Kernel-Release: `uname -r`" -H "X-Vuls-Server-Name: `hostname`" --data-binary "$(dpkg-query -W -f="\${binary:Package},\${db:Status-Abbrev},\${Version},\${Source},\${source:Version}\n")" http://${VULS_SERVER}:5515/vuls > $LOCAL_REPORT
+    echo -e "$(dpkg-query -W -f="\${binary:Package},\${db:Status-Abbrev},\${Version},\${Source},\${source:Version}\n")" > pkgs.log
+    curl -X POST -H "Content-Type: text/plain" -H "X-Vuls-OS-Family: `lsb_release -si | awk '{print tolower($1)}'`" -H "X-Vuls-OS-Release: `lsb_release -sr | awk '{print $1}'`" -H "X-Vuls-Kernel-Release: `uname -r`" -H "X-Vuls-Server-Name: `hostname`" --data-binary @pkgs.log http://${VULS_SERVER}:5515/vuls > $LOCAL_REPORT
+    rm -f pkgs.log 2>/dev/null
     verify_scan
 }
 
