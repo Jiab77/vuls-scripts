@@ -47,7 +47,7 @@ scan_ubuntu() {
     echo -e "${WHITE}Scanning ${GREEN}$(hostname) ${WHITE}/${YELLOW} Ubuntu ${WHITE}based client...${NC}${NL}"
     # curl -X POST -H "Content-Type: text/plain" -H "X-Vuls-OS-Family: `lsb_release -si | awk '{print tolower($1)}'`" -H "X-Vuls-OS-Release: `lsb_release -sr | awk '{print $1}'`" -H "X-Vuls-Kernel-Release: `uname -r`" -H "X-Vuls-Server-Name: `hostname`" --data-binary "$(dpkg-query -W -f="\${binary:Package},\${db:Status-Abbrev},\${Version},\${Source},\${source:Version}\n")" http://${VULS_SERVER}:5515/vuls > $LOCAL_REPORT
     echo -e "$(dpkg-query -W -f="\${binary:Package},\${db:Status-Abbrev},\${Version},\${Source},\${source:Version}\n")" > $PACK_LIST
-    curl -X POST -H "Content-Type: text/plain" -H "X-Vuls-OS-Family: `lsb_release -si | awk '{print tolower($1)}'`" -H "X-Vuls-OS-Release: `lsb_release -sr | awk '{print $1}'`" -H "X-Vuls-Kernel-Release: `uname -r`" -H "X-Vuls-Server-Name: `hostname`" --data-binary @pkgs.log http://${VULS_SERVER}:5515/vuls > $LOCAL_REPORT
+    curl -X POST -H "Content-Type: text/plain" -H "X-Vuls-OS-Family: `lsb_release -si | awk '{print tolower($1)}'`" -H "X-Vuls-OS-Release: `lsb_release -sr | awk '{print $1}'`" -H "X-Vuls-Kernel-Release: `uname -r`" -H "X-Vuls-Server-Name: `hostname`" --data-binary @$PACK_LIST http://${VULS_SERVER}:5515/vuls > $LOCAL_REPORT
     rm -f $PACK_LIST 2>/dev/null
     verify_scan
 }
@@ -55,11 +55,15 @@ scan_ubuntu() {
 # Scan CentOS client
 scan_centos() {
     echo -e "${WHITE}Scanning ${GREEN}$(hostname) ${WHITE}/${YELLOW} CentOS ${WHITE}based client...${NC}${NL}"
+	echo -e "`rpm -qa --queryformat "%{NAME} %{EPOCHNUM} %{VERSION} %{RELEASE} %{ARCH}\n"`" > $PACK_LIST
     if [[ $REDHAT6 == "true" ]]; then
-        curl -X POST -H "Content-Type: text/plain" -H "X-Vuls-OS-Family: `awk '{print tolower($1)}' /etc/redhat-release`" -H "X-Vuls-OS-Release: `awk '{print $3}' /etc/redhat-release`" -H "X-Vuls-Kernel-Release: `uname -r`" -H "X-Vuls-Server-Name: `hostname`" --data-binary "`rpm -qa --queryformat "%{NAME} %{EPOCHNUM} %{VERSION} %{RELEASE} %{ARCH}\n"`" http://${VULS_SERVER}:5515/vuls > $LOCAL_REPORT
+        # curl -X POST -H "Content-Type: text/plain" -H "X-Vuls-OS-Family: `awk '{print tolower($1)}' /etc/redhat-release`" -H "X-Vuls-OS-Release: `awk '{print $3}' /etc/redhat-release`" -H "X-Vuls-Kernel-Release: `uname -r`" -H "X-Vuls-Server-Name: `hostname`" --data-binary "`rpm -qa --queryformat "%{NAME} %{EPOCHNUM} %{VERSION} %{RELEASE} %{ARCH}\n"`" http://${VULS_SERVER}:5515/vuls > $LOCAL_REPORT
+        curl -X POST -H "Content-Type: text/plain" -H "X-Vuls-OS-Family: `awk '{print tolower($1)}' /etc/redhat-release`" -H "X-Vuls-OS-Release: `awk '{print $3}' /etc/redhat-release`" -H "X-Vuls-Kernel-Release: `uname -r`" -H "X-Vuls-Server-Name: `hostname`" --data-binary @$PACK_LIST "`rpm -qa --queryformat "%{NAME} %{EPOCHNUM} %{VERSION} %{RELEASE} %{ARCH}\n"`" http://${VULS_SERVER}:5515/vuls > $LOCAL_REPORT
     else
-        curl -X POST -H "Content-Type: text/plain" -H "X-Vuls-OS-Family: `awk '{print tolower($1)}' /etc/redhat-release`" -H "X-Vuls-OS-Release: `awk '{print $4}' /etc/redhat-release`" -H "X-Vuls-Kernel-Release: `uname -r`" -H "X-Vuls-Server-Name: `hostname`" --data-binary "`rpm -qa --queryformat "%{NAME} %{EPOCHNUM} %{VERSION} %{RELEASE} %{ARCH}\n"`" http://${VULS_SERVER}:5515/vuls > $LOCAL_REPORT
+        # curl -X POST -H "Content-Type: text/plain" -H "X-Vuls-OS-Family: `awk '{print tolower($1)}' /etc/redhat-release`" -H "X-Vuls-OS-Release: `awk '{print $4}' /etc/redhat-release`" -H "X-Vuls-Kernel-Release: `uname -r`" -H "X-Vuls-Server-Name: `hostname`" --data-binary "`rpm -qa --queryformat "%{NAME} %{EPOCHNUM} %{VERSION} %{RELEASE} %{ARCH}\n"`" http://${VULS_SERVER}:5515/vuls > $LOCAL_REPORT
+        curl -X POST -H "Content-Type: text/plain" -H "X-Vuls-OS-Family: `awk '{print tolower($1)}' /etc/redhat-release`" -H "X-Vuls-OS-Release: `awk '{print $4}' /etc/redhat-release`" -H "X-Vuls-Kernel-Release: `uname -r`" -H "X-Vuls-Server-Name: `hostname`" --data-binary @$PACK_LIST "`rpm -qa --queryformat "%{NAME} %{EPOCHNUM} %{VERSION} %{RELEASE} %{ARCH}\n"`" http://${VULS_SERVER}:5515/vuls > $LOCAL_REPORT
     fi
+	rm -f $PACK_LIST 2>/dev/null
     verify_scan
 }
 
