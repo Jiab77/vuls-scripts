@@ -21,6 +21,7 @@ echo -e "${NL}${BLUE}Vuls client scan script ${WHITE}/ Jiab77 - 2020${NC}${NL}"
 # Config
 VULS_SERVER=$1
 LOCAL_REPORT="$(hostname).json"
+PACK_LIST=/tmp/pkgs.log
 REDHAT6=false
 
 # Detect client platform
@@ -45,9 +46,9 @@ verify_scan() {
 scan_ubuntu() {
     echo -e "${WHITE}Scanning ${GREEN}$(hostname) ${WHITE}/${YELLOW} Ubuntu ${WHITE}based client...${NC}${NL}"
     # curl -X POST -H "Content-Type: text/plain" -H "X-Vuls-OS-Family: `lsb_release -si | awk '{print tolower($1)}'`" -H "X-Vuls-OS-Release: `lsb_release -sr | awk '{print $1}'`" -H "X-Vuls-Kernel-Release: `uname -r`" -H "X-Vuls-Server-Name: `hostname`" --data-binary "$(dpkg-query -W -f="\${binary:Package},\${db:Status-Abbrev},\${Version},\${Source},\${source:Version}\n")" http://${VULS_SERVER}:5515/vuls > $LOCAL_REPORT
-    echo -e "$(dpkg-query -W -f="\${binary:Package},\${db:Status-Abbrev},\${Version},\${Source},\${source:Version}\n")" > pkgs.log
+    echo -e "$(dpkg-query -W -f="\${binary:Package},\${db:Status-Abbrev},\${Version},\${Source},\${source:Version}\n")" > $PACK_LIST
     curl -X POST -H "Content-Type: text/plain" -H "X-Vuls-OS-Family: `lsb_release -si | awk '{print tolower($1)}'`" -H "X-Vuls-OS-Release: `lsb_release -sr | awk '{print $1}'`" -H "X-Vuls-Kernel-Release: `uname -r`" -H "X-Vuls-Server-Name: `hostname`" --data-binary @pkgs.log http://${VULS_SERVER}:5515/vuls > $LOCAL_REPORT
-    rm -f pkgs.log 2>/dev/null
+    rm -f $PACK_LIST 2>/dev/null
     verify_scan
 }
 
