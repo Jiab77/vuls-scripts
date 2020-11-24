@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Vuls (docker) management / reporting script
-# Made by Jonathan Barda / SIB - 2020
+# Made by Jiab77 - 2020
 
 # Colors
 NC="\033[0m"
@@ -14,7 +14,7 @@ WHITE="\033[1;37m"
 PURPLE="\033[1;35m"
 
 # Header
-echo -e "${NL}${BLUE}Vuls ${PURPLE}docker${BLUE} management script ${WHITE}/ SIB - 2020${NC}${NL}"
+echo -e "${NL}${BLUE}Vuls ${PURPLE}(docker)${BLUE} management script ${WHITE}/ SIB - 2020${NC}${NL}"
 
 ((!$#)) && echo -e "${WHITE}Usage:${GREEN} $0 ${YELLOW}<action> ${WHITE}(${PURPLE}server | init | local-scan | tui | webui | history | report | report-all | reporting | create-config | reset-config | config-test | update | help${WHITE})${NC}${NL}" && exit 1
 
