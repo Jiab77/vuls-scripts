@@ -39,10 +39,10 @@ RESULTS_DIR="$DOCKER_DIR/results"
 
 Files to add / update:
 
-* [docker/config-test.sh](testing/docker/config-test.sh)
-* [docker/history.sh](testing/docker/history.sh)
+* [docker/config-test.sh](testing/docker/config-test.sh) - See pull request [#22](https://github.com/vulsio/vulsctl/pull/22)
+* [docker/history.sh](testing/docker/history.sh) - See pull request [#22](https://github.com/vulsio/vulsctl/pull/22)
 * [docker/oval.sh](testing/docker/oval.sh) - See pull request [#20](https://github.com/vulsio/vulsctl/pull/20)
-* [docker/report.sh](testing/docker/report.sh)
+* [docker/report.sh](testing/docker/report.sh) - See pull request [#22](https://github.com/vulsio/vulsctl/pull/22)
 * [docker/server.sh](testing/docker/server.sh) - See pull request [#19](https://github.com/vulsio/vulsctl/pull/19)
 
 ### Native
