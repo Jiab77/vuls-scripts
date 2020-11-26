@@ -23,10 +23,6 @@ The scripts are based on [vulsctl](https://vuls.io/docs/en/install-with-vulsctl.
 
 You can use the scripts in [Docker](https://docs.docker.com/engine/) based environment with or without the [Rootless](https://docs.docker.com/engine/security/rootless/) mode or natively.
 
-> Please, upload the scripts in the [testing](testing/) folder to your local installation before running the `vuls-*` scripts.
->
-> These scripts are not added yet to the [vulsctl](https://github.com/vulsio/vulsctl) project.
-
 ### Docker
 
 Script configuration:
@@ -36,14 +32,6 @@ VULSCTL_DIR="$HOME/vulsctl"
 DOCKER_DIR="$VULSCTL_DIR/docker"
 RESULTS_DIR="$DOCKER_DIR/results"
 ```
-
-Files to add / update:
-
-* [docker/config-test.sh](testing/docker/config-test.sh) - See pull request [#22](https://github.com/vulsio/vulsctl/pull/22)
-* [docker/history.sh](testing/docker/history.sh) - See pull request [#22](https://github.com/vulsio/vulsctl/pull/22)
-* [docker/oval.sh](testing/docker/oval.sh) - See pull request [#20](https://github.com/vulsio/vulsctl/pull/20)
-* [docker/report.sh](testing/docker/report.sh) - See pull request [#22](https://github.com/vulsio/vulsctl/pull/22)
-* [docker/server.sh](testing/docker/server.sh) - See pull request [#19](https://github.com/vulsio/vulsctl/pull/19)
 
 ### Native
 
@@ -55,12 +43,6 @@ VULSREPO_DIR="$HOME/vulsrepo"
 INSTALL_DIR="$VULSCTL_DIR/install-host"
 RESULTS_DIR="$INSTALL_DIR/results"
 ```
-
-Files to add / update:
-
-* [install-host/install.sh](testing/install-host/install.sh) - See pull request [#17](https://github.com/vulsio/vulsctl/pull/17)
-* [install-host/oval.sh](testing/install-host/oval.sh) - See pull request [#20](https://github.com/vulsio/vulsctl/pull/20)
-* [install-host/upgrade.sh](testing/install-host/upgrade.sh) - See pull request [#17](https://github.com/vulsio/vulsctl/pull/17)
 
 ## Credits
 
