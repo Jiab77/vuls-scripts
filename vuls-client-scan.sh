@@ -3,6 +3,14 @@
 # Vuls client scan script
 # Made by Jiab77 - 2020
 
+# References:
+# https://vuls.io/docs/en/usage-server.html
+# https://docs.oracle.com/en/database/oracle/oracle-database/18/ladbi/checking-kernel-and-package-requirements-for-linux.html#GUID-7065A86D-C2AB-4731-953B-12AC25C94156
+# https://oracle-base.com/articles/linux/installing-software-packages
+# https://www.cyberciti.biz/faq/how-do-i-determine-rhel-version/
+# https://www.cyberciti.biz/faq/howto-list-installed-rpm-package/
+# https://www.2daygeek.com/linux-rpm-command-examples-manage-packages-fedora-centos-rhel-systems/
+
 # Colors
 NC="\033[0m"
 NL="\n"
@@ -48,8 +56,13 @@ scan_ubuntu() {
     echo -e "${WHITE}Scanning ${GREEN}$(hostname) ${WHITE}/${YELLOW} Ubuntu ${WHITE}based client...${NC}${NL}"
     echo -e "$(dpkg-query -W -f="\${binary:Package},\${db:Status-Abbrev},\${Version},\${Source},\${source:Version}\n")" > $PACK_LIST
     curl -X POST -H "Content-Type: text/plain" -H "X-Vuls-OS-Family: `lsb_release -si | awk '{print tolower($1)}'`" -H "X-Vuls-OS-Release: `lsb_release -sr | awk '{print $1}'`" -H "X-Vuls-Kernel-Release: `uname -r`" -H "X-Vuls-Server-Name: `hostname`" --data-binary @$PACK_LIST http://${VULS_SERVER}:5515/vuls > $LOCAL_REPORT
+    ret_code=$?
+    if [[ $ret_code -eq 7 ]]; then
+        echo -e "${NL}${RED}Failed to reach the scan server.${NC}${NL}"
+    else
+        verify_scan
+    fi
     rm -f $PACK_LIST 2>/dev/null
-    verify_scan
 }
 
 # Scan CentOS client
@@ -61,8 +74,41 @@ scan_centos() {
     else
         curl -X POST -H "Content-Type: text/plain" -H "X-Vuls-OS-Family: `awk '{print tolower($1)}' /etc/redhat-release`" -H "X-Vuls-OS-Release: `awk '{print $4}' /etc/redhat-release`" -H "X-Vuls-Kernel-Release: `uname -r`" -H "X-Vuls-Server-Name: `hostname`" --data-binary @$PACK_LIST http://${VULS_SERVER}:5515/vuls > $LOCAL_REPORT
     fi
+    ret_code=$?
+    if [[ $ret_code -eq 7 ]]; then
+        echo -e "${NL}${RED}Failed to reach the scan server.${NC}${NL}"
+    else
+        verify_scan
+    fi
     rm -f $PACK_LIST 2>/dev/null
-    verify_scan
+}
+
+# Scan RedHat Entreprise Linux client
+scan_rhel() {
+    echo -e "${WHITE}Scanning ${GREEN}$(hostname) ${WHITE}/${YELLOW} RedHat Entreprise Linux ${WHITE}based client...${NC}${NL}"
+    echo -e "`rpm -qa --queryformat "%{NAME} %{EPOCHNUM} %{VERSION} %{RELEASE} %{ARCH}\n"`" > $PACK_LIST
+    curl -X POST -H "Content-Type: text/plain" -H "X-Vuls-OS-Family: `awk '{print tolower($1)}' /etc/redhat-release`" -H "X-Vuls-OS-Release: `awk '{print $7}' /etc/redhat-release`" -H "X-Vuls-Kernel-Release: `uname -r`" -H "X-Vuls-Server-Name: `hostname`" --data-binary @$PACK_LIST http://${VULS_SERVER}:5515/vuls > $LOCAL_REPORT
+    ret_code=$?
+    if [[ $ret_code -eq 7 ]]; then
+        echo -e "${NL}${RED}Failed to reach the scan server.${NC}${NL}"
+    else
+        verify_scan
+    fi
+    rm -f $PACK_LIST 2>/dev/null
+}
+
+# Scan Oracle Linux client
+scan_oracle() {
+    echo -e "${WHITE}Scanning ${GREEN}$(hostname) ${WHITE}/${YELLOW} Oracle Linux ${WHITE}based client...${NC}${NL}"
+    echo -e "`rpm -qa --queryformat "%{NAME} %{EPOCHNUM} %{VERSION} %{RELEASE} %{ARCH}\n"`" > $PACK_LIST
+    curl -X POST -H "Content-Type: text/plain" -H "X-Vuls-OS-Family: `awk '{print tolower($1)}' /etc/oracle-release`" -H "X-Vuls-OS-Release: `awk '{print $5}' /etc/oracle-release`" -H "X-Vuls-Kernel-Release: `uname -r`" -H "X-Vuls-Server-Name: `hostname`" --data-binary @$PACK_LIST http://${VULS_SERVER}:5515/vuls > $LOCAL_REPORT
+    ret_code=$?
+    if [[ $ret_code -eq 7 ]]; then
+        echo -e "${NL}${RED}Failed to reach the scan server.${NC}${NL}"
+    else
+        verify_scan
+    fi
+    rm -f $PACK_LIST 2>/dev/null
 }
 
 # Select which function to run on the client
@@ -71,7 +117,11 @@ case $distro in
         scan_ubuntu;;
     "centos")
         scan_centos;;
-    *)  # we can add more install command for each distros.
+    "rhel")
+        scan_rhel;;
+    "ol")
+        scan_oracle;;
+    *)  # we can add more scanning commands for each distros.
         echo -e "${YELLOW}Your OS distribution [${RED}${distro}${YELLOW}] is not supported by the script yet.${NC}"
         echo -e "${YELLOW}Details:${NC}${NL}"
         if [[ $REDHAT6 == "true" ]]; then
@@ -79,6 +129,6 @@ case $distro in
         else
             cat /etc/os-release
         fi
-        echo -e "${NL}${YELLOW}Please contact the dev.${NC}${NL}"
+        echo -e "${NL}${YELLOW}Please contact the admins.${NC}${NL}"
     ;;
 esac
