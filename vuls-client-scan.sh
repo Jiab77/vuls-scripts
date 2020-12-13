@@ -3,6 +3,9 @@
 # Vuls client scan script
 # Made by Jiab77 - 2020
 
+# TODO:
+# - Implement: ./vuls-client-scan.sh <server-ip> <reporting-hostname>
+
 # References:
 # https://vuls.io/docs/en/usage-server.html
 # https://docs.oracle.com/en/database/oracle/oracle-database/18/ladbi/checking-kernel-and-package-requirements-for-linux.html#GUID-7065A86D-C2AB-4731-953B-12AC25C94156
@@ -29,7 +32,8 @@ echo -e "${NL}${BLUE}Vuls client scan script ${WHITE}/ Jiab77 - 2020${NC}${NL}"
 
 # Config
 VULS_SERVER=$1
-LOCAL_REPORT="$(hostname).json"
+HOST_FQDN="$(hostname -f)"
+LOCAL_REPORT="${HOST_FQDN}.json"
 PACK_LIST=/tmp/pkgs.log
 REDHAT6=false
 
@@ -53,9 +57,9 @@ verify_scan() {
 
 # Scan Ubuntu client
 scan_ubuntu() {
-    echo -e "${WHITE}Scanning ${GREEN}$(hostname) ${WHITE}/${YELLOW} Ubuntu ${WHITE}based client...${NC}${NL}"
+    echo -e "${WHITE}Scanning ${GREEN}${HOST_FQDN} ${WHITE}/${YELLOW} Ubuntu ${WHITE}based client...${NC}${NL}"
     echo -e "$(dpkg-query -W -f="\${binary:Package},\${db:Status-Abbrev},\${Version},\${Source},\${source:Version}\n")" > $PACK_LIST
-    curl -X POST -H "Content-Type: text/plain" -H "X-Vuls-OS-Family: `lsb_release -si | awk '{print tolower($1)}'`" -H "X-Vuls-OS-Release: `lsb_release -sr | awk '{print $1}'`" -H "X-Vuls-Kernel-Release: `uname -r`" -H "X-Vuls-Server-Name: `hostname`" --data-binary @$PACK_LIST http://${VULS_SERVER}:5515/vuls > $LOCAL_REPORT
+    curl -X POST -H "Content-Type: text/plain" -H "X-Vuls-OS-Family: `lsb_release -si | awk '{print tolower($1)}'`" -H "X-Vuls-OS-Release: `lsb_release -sr | awk '{print $1}'`" -H "X-Vuls-Kernel-Release: `uname -r`" -H "X-Vuls-Server-Name: ${HOST_FQDN}" --data-binary @$PACK_LIST http://${VULS_SERVER}:5515/vuls > $LOCAL_REPORT
     ret_code=$?
     if [[ $ret_code -eq 7 ]]; then
         echo -e "${NL}${RED}Failed to reach the scan server.${NC}${NL}"
@@ -67,12 +71,12 @@ scan_ubuntu() {
 
 # Scan CentOS client
 scan_centos() {
-    echo -e "${WHITE}Scanning ${GREEN}$(hostname) ${WHITE}/${YELLOW} CentOS ${WHITE}based client...${NC}${NL}"
+    echo -e "${WHITE}Scanning ${GREEN}${HOST_FQDN} ${WHITE}/${YELLOW} CentOS ${WHITE}based client...${NC}${NL}"
     echo -e "`rpm -qa --queryformat "%{NAME} %{EPOCHNUM} %{VERSION} %{RELEASE} %{ARCH}\n"`" > $PACK_LIST
     if [[ $REDHAT6 == "true" ]]; then
-        curl -X POST -H "Content-Type: text/plain" -H "X-Vuls-OS-Family: `awk '{print tolower($1)}' /etc/redhat-release`" -H "X-Vuls-OS-Release: `awk '{print $3}' /etc/redhat-release`" -H "X-Vuls-Kernel-Release: `uname -r`" -H "X-Vuls-Server-Name: `hostname`" --data-binary @$PACK_LIST http://${VULS_SERVER}:5515/vuls > $LOCAL_REPORT
+        curl -X POST -H "Content-Type: text/plain" -H "X-Vuls-OS-Family: `awk '{print tolower($1)}' /etc/redhat-release`" -H "X-Vuls-OS-Release: `awk '{print $3}' /etc/redhat-release`" -H "X-Vuls-Kernel-Release: `uname -r`" -H "X-Vuls-Server-Name: ${HOST_FQDN}" --data-binary @$PACK_LIST http://${VULS_SERVER}:5515/vuls > $LOCAL_REPORT
     else
-        curl -X POST -H "Content-Type: text/plain" -H "X-Vuls-OS-Family: `awk '{print tolower($1)}' /etc/redhat-release`" -H "X-Vuls-OS-Release: `awk '{print $4}' /etc/redhat-release`" -H "X-Vuls-Kernel-Release: `uname -r`" -H "X-Vuls-Server-Name: `hostname`" --data-binary @$PACK_LIST http://${VULS_SERVER}:5515/vuls > $LOCAL_REPORT
+        curl -X POST -H "Content-Type: text/plain" -H "X-Vuls-OS-Family: `awk '{print tolower($1)}' /etc/redhat-release`" -H "X-Vuls-OS-Release: `awk '{print $4}' /etc/redhat-release`" -H "X-Vuls-Kernel-Release: `uname -r`" -H "X-Vuls-Server-Name: ${HOST_FQDN}" --data-binary @$PACK_LIST http://${VULS_SERVER}:5515/vuls > $LOCAL_REPORT
     fi
     ret_code=$?
     if [[ $ret_code -eq 7 ]]; then
@@ -85,9 +89,9 @@ scan_centos() {
 
 # Scan RedHat Entreprise Linux client
 scan_rhel() {
-    echo -e "${WHITE}Scanning ${GREEN}$(hostname) ${WHITE}/${YELLOW} RedHat Entreprise Linux ${WHITE}based client...${NC}${NL}"
+    echo -e "${WHITE}Scanning ${GREEN}${HOST_FQDN} ${WHITE}/${YELLOW} RedHat Entreprise Linux ${WHITE}based client...${NC}${NL}"
     echo -e "`rpm -qa --queryformat "%{NAME} %{EPOCHNUM} %{VERSION} %{RELEASE} %{ARCH}\n"`" > $PACK_LIST
-    curl -X POST -H "Content-Type: text/plain" -H "X-Vuls-OS-Family: `awk '{print tolower($1)}' /etc/redhat-release`" -H "X-Vuls-OS-Release: `awk '{print $7}' /etc/redhat-release`" -H "X-Vuls-Kernel-Release: `uname -r`" -H "X-Vuls-Server-Name: `hostname`" --data-binary @$PACK_LIST http://${VULS_SERVER}:5515/vuls > $LOCAL_REPORT
+    curl -X POST -H "Content-Type: text/plain" -H "X-Vuls-OS-Family: `awk '{print tolower($1)}' /etc/redhat-release`" -H "X-Vuls-OS-Release: `awk '{print $7}' /etc/redhat-release`" -H "X-Vuls-Kernel-Release: `uname -r`" -H "X-Vuls-Server-Name: ${HOST_FQDN}" --data-binary @$PACK_LIST http://${VULS_SERVER}:5515/vuls > $LOCAL_REPORT
     ret_code=$?
     if [[ $ret_code -eq 7 ]]; then
         echo -e "${NL}${RED}Failed to reach the scan server.${NC}${NL}"
@@ -99,9 +103,9 @@ scan_rhel() {
 
 # Scan Oracle Linux client
 scan_oracle() {
-    echo -e "${WHITE}Scanning ${GREEN}$(hostname) ${WHITE}/${YELLOW} Oracle Linux ${WHITE}based client...${NC}${NL}"
+    echo -e "${WHITE}Scanning ${GREEN}${HOST_FQDN} ${WHITE}/${YELLOW} Oracle Linux ${WHITE}based client...${NC}${NL}"
     echo -e "`rpm -qa --queryformat "%{NAME} %{EPOCHNUM} %{VERSION} %{RELEASE} %{ARCH}\n"`" > $PACK_LIST
-    curl -X POST -H "Content-Type: text/plain" -H "X-Vuls-OS-Family: `awk '{print tolower($1)}' /etc/oracle-release`" -H "X-Vuls-OS-Release: `awk '{print $5}' /etc/oracle-release`" -H "X-Vuls-Kernel-Release: `uname -r`" -H "X-Vuls-Server-Name: `hostname`" --data-binary @$PACK_LIST http://${VULS_SERVER}:5515/vuls > $LOCAL_REPORT
+    curl -X POST -H "Content-Type: text/plain" -H "X-Vuls-OS-Family: `awk '{print tolower($1)}' /etc/oracle-release`" -H "X-Vuls-OS-Release: `awk '{print $5}' /etc/oracle-release`" -H "X-Vuls-Kernel-Release: `uname -r`" -H "X-Vuls-Server-Name: ${HOST_FQDN}" --data-binary @$PACK_LIST http://${VULS_SERVER}:5515/vuls > $LOCAL_REPORT
     ret_code=$?
     if [[ $ret_code -eq 7 ]]; then
         echo -e "${NL}${RED}Failed to reach the scan server.${NC}${NL}"
