@@ -6,6 +6,7 @@
 # Colors
 NC="\033[0m"
 NL="\n"
+TAB="\t"
 BLUE="\033[1;34m"
 YELLOW="\033[1;33m"
 GREEN="\033[1;32m"
@@ -16,7 +17,30 @@ PURPLE="\033[1;35m"
 # Header
 echo -e "${NL}${BLUE}Vuls ${PURPLE}(native)${BLUE} management script ${WHITE}/ Jiab77 - 2020${NC}${NL}"
 
-((!$#)) && echo -e "${WHITE}Usage:${GREEN} $0 ${YELLOW}<action> ${WHITE}(${PURPLE}server | init | local-scan | tui | webui | history | report | report-all | reporting | send-to | send-all-to | create-config | reset-config | config-test | update | help${WHITE})${NC}${NL}" && exit 1
+# Functions
+show_help() {
+    echo -e "${WHITE}Usage:${GREEN} $0 ${YELLOW}<action>${NC}"
+    echo -e "${TAB}${YELLOW}server${TAB}${TAB}${WHITE}- Start the scan server${NC}"
+    echo -e "${TAB}${YELLOW}init${TAB}${TAB}${WHITE}- Apply initial config settings${NC}"
+    echo -e "${TAB}${YELLOW}local-scan${TAB}${WHITE}- Run the initial local scan${NC}"
+    echo -e "${TAB}${YELLOW}tui${TAB}${TAB}${WHITE}- Start the terminal interface${NC}"
+    echo -e "${TAB}${YELLOW}webui${TAB}${TAB}${WHITE}- Start the web interface${NC}"
+    echo -e "${TAB}${YELLOW}history${TAB}${TAB}${WHITE}- Show scan history${NC}"
+    echo -e "${TAB}${YELLOW}report${TAB}${TAB}${WHITE}- Generate recent scan reports${NC}"
+    echo -e "${TAB}${YELLOW}report-all${TAB}${WHITE}- Generate all scan reports${NC}"
+    echo -e "${TAB}${YELLOW}reporting${TAB}${WHITE}- Generate and send recent scan reports by ${PURPLE}email${WHITE},${PURPLE}chatwork${WHITE},${PURPLE}slack${WHITE},${PURPLE}telegram${NC}"
+    echo -e "${TAB}${YELLOW}send-to${TAB}${TAB}${WHITE}- Generate and upload recent scan reports to ${PURPLE}azure${WHITE},${PURPLE}http${WHITE},${PURPLE}s3${NC}"
+    echo -e "${TAB}${YELLOW}send-all-to${TAB}${WHITE}- Generate and upload all scan reports to ${PURPLE}azure${WHITE},${PURPLE}http${WHITE},${PURPLE}s3${NC}"
+    echo -e "${TAB}${YELLOW}create-config${TAB}${WHITE}- Creating new config file from template${NC}"
+    echo -e "${TAB}${YELLOW}reset-config${TAB}${WHITE}- Reset Vuls configuration${NC}"
+    echo -e "${TAB}${YELLOW}config-test${TAB}${WHITE}- Validate current Vuls configuration${NC}"
+    echo -e "${TAB}${YELLOW}update${TAB}${TAB}${WHITE}- Update all vulnerabilities databases${NC}"
+    echo -e "${TAB}${YELLOW}help${TAB}${TAB}${WHITE}- Show help${NC}"
+    echo -e "${NL}"
+}
+
+# Arguments check
+((!$#)) && show_help && exit 1
 
 # Config
 DEBUG_SERVER=false
@@ -144,13 +168,13 @@ case "$1" in
         echo -e "${RED}Do not run this action if you have not configured any reporting methods in the file:${NL}- ${WHITE}$INSTALL_DIR/config.toml${RED}${NC}${NL}"
         if [[ $VULS_REPORT_METHOD == "" ]]; then
             echo -e "${WHITE}Usage: ${GREEN}${0} ${YELLOW}${1} ${BLUE}<reporting-method> ${PURPLE}<reporting-level>"
-            echo -e "${WHITE}Available reporting methods: ${YELLOW}email,hipchat,stride,chatwork,slack,telegram${NC}"
+            echo -e "${WHITE}Available reporting methods: ${YELLOW}email,chatwork,slack,telegram${NC}"
             echo -e "${WHITE}Reporting levels: ${YELLOW}1-10${NC}${NL}"
             echo -e "${RED}No reporting method defined.${NC}${NL}"
             exit 2
         elif [[ $VULS_REPORT_LEVEL == "" ]]; then
             echo -e "${WHITE}Usage: ${GREEN}${0} ${YELLOW}${1} ${BLUE}<reporting-method> ${PURPLE}<reporting-level>"
-            echo -e "${WHITE}Available reporting methods: ${YELLOW}email,hipchat,stride,chatwork,slack,telegram${NC}"
+            echo -e "${WHITE}Available reporting methods: ${YELLOW}email,chatwork,slack,telegram${NC}"
             echo -e "${WHITE}Reporting levels: ${YELLOW}1-10${NC}${NL}"
             echo -e "${RED}No reporting level defined.${NC}${NL}"
             exit 3
@@ -161,12 +185,6 @@ case "$1" in
             case "$VULS_REPORT_METHOD" in
                 "email")
                     cd $INSTALL_DIR ; vuls report -to-email -cvss-over=$VULS_REPORT_LEVEL
-                ;;
-                "hipchat")
-                    cd $INSTALL_DIR ; vuls report -to-hipchat -cvss-over=$VULS_REPORT_LEVEL
-                ;;
-                "stride")
-                    cd $INSTALL_DIR ; vuls report -to-stride -cvss-over=$VULS_REPORT_LEVEL
                 ;;
                 "chatwork")
                     cd $INSTALL_DIR ; vuls report -to-chatwork -cvss-over=$VULS_REPORT_LEVEL
@@ -258,23 +276,6 @@ case "$1" in
     ;;
 
     "help")
-        echo -e "${WHITE}Usage:${GREEN} $0 ${YELLOW}<action> ${WHITE}(${PURPLE}server | init | local-scan | tui | webui | history | report | report-all | reporting | send-to | send-all-to | create-config | reset-config | config-test | update | help${WHITE})${NC}"
-        echo -e "${PURPLE} - ${YELLOW}server: ${WHITE}Start the scan server${NC}"
-        echo -e "${PURPLE} - ${YELLOW}init: ${WHITE}Apply initial config settings${NC}"
-        echo -e "${PURPLE} - ${YELLOW}local-scan: ${WHITE}Run the initial local scan${NC}"
-        echo -e "${PURPLE} - ${YELLOW}tui: ${WHITE}Start the terminal interface${NC}"
-        echo -e "${PURPLE} - ${YELLOW}webui: ${WHITE}Start the web interface${NC}"
-        echo -e "${PURPLE} - ${YELLOW}history: ${WHITE}Show scan history${NC}"
-        echo -e "${PURPLE} - ${YELLOW}report: ${WHITE}Generate recent scan reports${NC}"
-        echo -e "${PURPLE} - ${YELLOW}report-all: ${WHITE}Generate all scan reports${NC}"
-        echo -e "${PURPLE} - ${YELLOW}reporting: ${WHITE}Generate and send recent scan reports by email,hipchat,stride,chatwork,slack,telegram${NC}"
-        echo -e "${PURPLE} - ${YELLOW}send-to: ${WHITE}Generate and upload recent scan reports to azure,http,s3${NC}"
-        echo -e "${PURPLE} - ${YELLOW}send-all-to: ${WHITE}Generate and upload all scan reports to azure,http,s3${NC}"
-        echo -e "${PURPLE} - ${YELLOW}create-config: ${WHITE}Creating new config file from template${NC}"
-        echo -e "${PURPLE} - ${YELLOW}reset-config: ${WHITE}Reset Vuls configuration${NC}"
-        echo -e "${PURPLE} - ${YELLOW}config-test: ${WHITE}Validate current Vuls configuration${NC}"
-        echo -e "${PURPLE} - ${YELLOW}update: ${WHITE}Update all vulnerabilities databases${NC}"
-        echo -e "${PURPLE} - ${YELLOW}help: ${WHITE}Show help${NC}"
-        echo -e "${NL}"
+        show_help
     ;;
 esac
