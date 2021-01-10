@@ -1,0 +1,15 @@
+[Unit]
+Description=vuls server daemon
+Documentation=https://github.com/future-architect/vuls
+
+[Service]
+ExecStart = /root/vuls-service-wrapper.sh
+ExecRestart = /bin/kill -WINCH ${MAINPID} ; /root/vuls-service-wrapper.sh
+ExecStop = /bin/kill -WINCH ${MAINPID}
+Restart = no
+Type = simple
+User = root
+Group = root
+
+[Install]
+WantedBy = multi-user.target
