@@ -92,8 +92,7 @@ case "$1" in
         echo -e "${WHITE}Applying ${GREEN}initial${WHITE} config settings...${NC}${NL}"
 
         # Patch current config
-        cd $DOCKER_DIR
-        cp config.toml config.toml.before-init
+        cp $DOCKER_DIR/config.toml $DOCKER_DIR/config.toml.before-init
         sed -e 's/#\[servers.name\]/\[servers.localhost\]/' -i config.toml
         sed -e 's/#host                = "127.0.0.1"/host                = "127.0.0.1"/' -i config.toml
         sed -e 's/#port               = "22"/port                = "local"/' -i config.toml
@@ -103,22 +102,21 @@ case "$1" in
         sed -e 's|keyPath            = "/root/.ssh/id_rsa"|#keyPath            = "/root/.ssh/id_rsa"|' -i config.toml
 
         # Test new config
-        ./config-test.sh
+        cd $DOCKER_DIR ; ./config-test.sh
     ;;
 
     "local-scan")
         echo -e "${WHITE}Running ${GREEN}initial${WHITE} local scan...${NC}${NL}"
 
         # Replace current config by localscan config
-        cd $DOCKER_DIR
-        cp config.toml config.toml.before
-        cp $VULSCTL_DIR/config.toml.localscan config.toml
+        cp $DOCKER_DIR/config.toml $DOCKER_DIR/config.toml.before
+        cp $VULSCTL_DIR/config.toml.localscan $DOCKER_DIR/config.toml
 
         # Scan without arguments
-        ./scan.sh
+        cd $DOCKER_DIR ; ./scan.sh
 
         # Restore current config
-        mv config.toml.before config.toml
+        mv $DOCKER_DIR/config.toml.before $DOCKER_DIR/config.toml
     ;;
 
     "tui")

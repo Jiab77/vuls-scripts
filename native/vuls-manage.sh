@@ -90,8 +90,7 @@ case "$1" in
         echo -e "${WHITE}Applying ${GREEN}initial${WHITE} config settings...${NC}${NL}"
 
         # Patch current config
-        cd $INSTALL_DIR
-        cp config.toml config.toml.before-init
+        cp $INSTALL_DIR/config.toml $INSTALL_DIR/config.toml.before-init
         sed -e 's/#\[servers.name\]/\[servers.localhost\]/' -i config.toml
         sed -e 's/#host                = "127.0.0.1"/host                = "127.0.0.1"/' -i config.toml
         sed -e 's/#port               = "22"/port                = "local"/' -i config.toml
@@ -101,22 +100,21 @@ case "$1" in
         sed -e 's|keyPath            = "/root/.ssh/id_rsa"|#keyPath            = "/root/.ssh/id_rsa"|' -i config.toml
 
         # Test new config
-        vuls configtest
+        cd $INSTALL_DIR ; vuls configtest
     ;;
 
     "local-scan")
         echo -e "${WHITE}Running ${GREEN}initial${WHITE} local scan...${NC}${NL}"
 
         # Replace current config by localscan config
-        cd $INSTALL_DIR
-        cp config.toml config.toml.before
-        cp $VULSCTL_DIR/config.toml.localscan config.toml
+        cp $INSTALL_DIR/config.toml $INSTALL_DIR/config.toml.before
+        cp $VULSCTL_DIR/config.toml.localscan $INSTALL_DIR/config.toml
 
         # Scan without arguments
-        vuls scan
+        cd $INSTALL_DIR ; vuls scan
 
         # Restore current config
-        mv config.toml.before config.toml
+        mv $INSTALL_DIR/config.toml.before $INSTALL_DIR/config.toml
     ;;
 
     "tui")
