@@ -36,7 +36,7 @@ show_help() {
     echo -e "${TAB}${YELLOW}config-test${TAB}${WHITE}- Validate current Vuls configuration${NC}"
     echo -e "${TAB}${YELLOW}update${TAB}${TAB}${WHITE}- Update all vulnerabilities databases${NC}"
     echo -e "${TAB}${YELLOW}help${TAB}${TAB}${WHITE}- Show help${NC}"
-    echo -e "${NL}"
+    echo -e ""
 }
 
 # Arguments check
@@ -276,6 +276,11 @@ case "$1" in
     ;;
 
     "help")
+        show_help
+    ;;
+
+    *)
+        echo -e "${YELLOW}Invalid option: ${RED}$1${NC}${NL}"
         show_help
     ;;
 esac
