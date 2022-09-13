@@ -44,7 +44,7 @@ echo -e "${NL}${BLUE}Vuls client scan script ${WHITE}/ Jiab77 - 2022${NC}${NL}"
 DEBUG_MODE=false
 VULS_SERVER=$1
 HOST_FQDN="$(hostname -f)"
-LOCAL_REPORT="${HOST_FQDN}.json"
+LOCAL_REPORT="/tmp/${HOST_FQDN}.json"
 PACK_LIST=/tmp/pkgs.log
 REDHAT6=false
 
