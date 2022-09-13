@@ -6,6 +6,10 @@
 #
 # Version: 0.5
 #
+# Install:
+# - sudo cp -v vuls-client-scan.sh /usr/local/bin/vuls-client-scan
+# - sudo chmod -v +x /usr/local/bin/vuls-client-scan
+#
 # TODO:
 # - Implement: ./vuls-client-scan.sh <server-ip> <reporting-hostname>
 #
