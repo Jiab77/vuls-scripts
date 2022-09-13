@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+SERVER="localhost"
+echo
+echo "###################"
+echo "# Vuls daily scan #"
+echo "###################"
+echo
+/usr/local/bin/vuls-client-scan $SERVER
