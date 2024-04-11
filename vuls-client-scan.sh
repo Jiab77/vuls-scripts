@@ -22,7 +22,7 @@
 # https://www.2daygeek.com/linux-rpm-command-examples-manage-packages-fedora-centos-rhel-systems/
 
 # Options
-set +o xtrace
+[[ -r $HOME/.debug ]] && set -o xtrace || set +o xtrace
 
 # Colors
 NC="\033[0m"
